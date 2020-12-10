@@ -93,3 +93,44 @@ INSERT INTO CastMember (ActorID, MovieID, Role) VALUES
 (3, 4, "Chet Ripley");
 
 -- SELECT * FROM CastMember;
+
+
+-- Update Queries
+-- Please write the following UPDATE queries:
+
+-- Change the title of Ghostbusters to Ghostbusters (1984) and the release date to 6/8/1984.
+
+UPDATE Movie 
+SET 
+    Title = 'Ghostbusters (1984)',
+    ReleaseDate = '1994/03/04'
+WHERE
+    Title = 'Ghost Busters';
+    
+SELECT * FROM Movie;
+
+-- Change the Action genre to Action/Adventure.
+
+UPDATE Genre
+SET 
+    GenreName = 'Action/Adventure'
+WHERE
+    GenreName = 'Action';
+-- SELECT * FROM Genre;
+
+-- Delete Queries
+-- Delete the movie Rambo: First Blood.
+
+DELETE FROM Movie WHERE Title = 'Rambo:First Blood';
+-- SELECT * FROM Movie;
+
+-- Altering Tables
+-- Alter the Actor table to add a column DateOfDeath. Set John Candy's record to be 3/4/1994.
+
+ALTER TABLE Actor ADD COLUMN DateOfDeath DATE NULL;
+
+UPDATE Actor
+SET 
+    DateOfDeath = '1994/03/04'
+WHERE FirstName = 'John' AND LastName = 'Candy';
+-- SELECT * FROM Actor;
