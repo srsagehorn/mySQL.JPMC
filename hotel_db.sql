@@ -1,0 +1,36 @@
+DROP DATABASE IF EXISTS HotelDB;
+
+CREATE DATABASE HotelDB;
+USE HotelDB;
+
+CREATE TABLE Amenities(
+	AmenitiesId INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    HasMicrowave BOOLEAN NOT NULL,
+    HasOven BOOLEAN NOT NULL,
+    HasJacuzzi BOOLEAN NOT NULL,
+    HasRefrigerator BOOLEAN NOT NULL
+);
+CREATE TABLE Guests(
+	GuestId INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    Name VARCHAR(30) NOT NULL,
+    Address VARCHAR(60) NOT NULL,
+    City VARCHAR(20) NOT NULL,
+    State VARCHAR(2) NOT NULL,
+    ZipCode VARCHAR(5) NOT NULL,
+    PhoneNumber VARCHAR(30) NOT NULL
+    
+);
+CREATE TABLE Rooms(
+	RoomNumber INT PRIMARY KEY NOT NULL,
+    Type VARCHAR(20) NOT NULL,
+    FOREIGN KEY Amenities(AmenitiesId) REFERENCES Amenities(AmenitiesId),
+    ADAAccessible BOOLEAN NOT NULL,
+    MaxOccupancy INT NOT NULL,
+    BasePrice INT NOT NULL,
+    ExtraPersonCost INT NOT NULL
+);
+CREATE TABLE Reservations(
+	ReservationId INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    FOREIGN KEY RoomId(RoomId) REFERENCES Rooms(RoomId),
+    FOREIGN KEY Amenities(AmenitiesId) REFERENCES Amenities(AmenitiesId)
+);
