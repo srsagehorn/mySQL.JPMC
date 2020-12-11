@@ -9,7 +9,8 @@ CREATE TABLE Amenities(
     HasOven BOOLEAN NOT NULL,
     HasJacuzzi BOOLEAN NOT NULL,
     HasRefrigerator BOOLEAN NOT NULL
-) ENGINE=INNODB;
+);
+
 CREATE TABLE Guests(
 	GuestId INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     Name VARCHAR(30) NOT NULL,
@@ -19,21 +20,37 @@ CREATE TABLE Guests(
     ZipCode VARCHAR(5) NOT NULL,
     PhoneNumber VARCHAR(30) NOT NULL
     
-) ENGINE=INNODB;
+);
+
 CREATE TABLE Rooms(
 	RoomNumber INT PRIMARY KEY NOT NULL,
     RoomType VARCHAR(20) NOT NULL,
-    FOREIGN KEY Amenities(AmenitiesId) REFERENCES Amenities(AmenitiesId),
+    AmenitiesId INT NOT NULL,
+    FOREIGN KEY (AmenitiesId) 
+		REFERENCES Amenities(AmenitiesId) 
+		ON DELETE CASCADE
+        ON UPDATE CASCADE,
     ADAAccessible BOOLEAN NOT NULL,
+    StandardOccupancy INT NOT NULL,
     MaxOccupancy INT NOT NULL,
     BasePrice INT NOT NULL,
     ExtraPersonCost INT NOT NULL
-) ENGINE=INNODB;
+);
+
 CREATE TABLE Reservations(
 	ReservationId INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    FOREIGN KEY Room(RoomNumber) REFERENCES Rooms(RoomNumber),
+    RoomNumber INT NOT NULL,
+    FOREIGN KEY (RoomNumber)
+		REFERENCES Rooms(RoomNumber)
+        ON UPDATE CASCADE 
+		ON DELETE CASCADE,
+	GuestId INT NOT NULL,
+    FOREIGN KEY GuestId(GuestId)
+		REFERENCES Guests(GuestId)
+        ON UPDATE CASCADE 
+		ON DELETE CASCADE,
     Adults INT NOT NULL,
     Children INT NOT NULL,
     StartDate DATE NOT NULL,
     EndDate DATE NOT NULL
-) ENGINE=INNODB;
+);
