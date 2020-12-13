@@ -11148,7 +11148,7 @@ SELECT FirstName, LastName, City FROM Client WHERE City = 'LaPlace' AND LastName
 -- 17. Select InvoiceId, Description, Price, Quantity, ServiceDate and the line item total, a calculated value, from InvoiceLineItem, where the line item total is between 15 and 25 dollars. (667 rows)
 
 -- Doesnt work
-SELECT InvoiceId, Description, Price, Quantity, ServiceDate, (Price*Quantity) AS LineItemTotal FROM InvoiceLineItem WHERE LineItemTotal >=15 AND LineItemTotal <=25;
+SELECT InvoiceId, Description, Price, Quantity, ServiceDate, (Price*Quantity) AS LineItemTotal FROM InvoiceLineItem WHERE LineItemTotal BETWEEN 15 AND 25;
 
 -- 18. Does the database include an email address for the Client, Estrella Bazely?
 
