@@ -16,6 +16,13 @@ INSERT INTO Amenities (HasMicrowave, HasOven, HasJacuzzi, HasRefrigerator) VALUE
 	(TRUE, TRUE, TRUE, TRUE), -- 15 MOJR
 	(FALSE, FALSE, FALSE, FALSE); -- 16 
     
+-- Only 4, 8, 10, 12, 13 used
+-- (FALSE, FALSE, FALSE, TRUE), -- 1 R
+-- (TRUE, FALSE, FALSE, TRUE), -- 2 MR
+-- (TRUE, FALSE, TRUE, FALSE),  -- 3 MJ
+-- (TRUE, FALSE, TRUE, TRUE), -- 4 MJR
+-- (TRUE, TRUE, FALSE, TRUE), -- 5 MOR
+    
 INSERT INTO Guests (FirstName, LastName, Address, City, State, ZipCode, PhoneNumber) VALUES
     ('Mack', 'Simmer', '379 Old Shore Street', 'Council Bluffs', 'IA', '51501', '(291) 553-0508'),
     ('Bettyann', 'Seery', '750 Wintergreen Dr.', 'Wasilla', 'AK', '99654', '(478) 277-9632'),
@@ -76,3 +83,7 @@ INSERT INTO Reservations (RoomNumber, GuestId, Adults, Children, StartDate, EndD
 	(206, 1, 2, 0, '2023-11-22', '2023-11-25'),
 	(301, 1, 2, 2, '2023-11-22', '2023-11-25'),
 	(302, 10, 2, 0, '2023-12-24', '2023-12-28');
+    
+DELETE 
+FROM Guests
+WHERE GuestId = 7;

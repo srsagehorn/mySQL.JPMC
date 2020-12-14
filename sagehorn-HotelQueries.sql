@@ -26,39 +26,37 @@ SELECT r.RoomNumber, r.StartDate, CONCAT(g.FirstName, ' ', g.LastName) AS Name, 
     FROM Reservations r
 INNER JOIN Guests g
     ON r.GuestId = g.GuestId
-WHERE CONCAT(g.FirstName, ' ',g.LastName) = 'Mack Simmer';
+WHERE CONCAT(g.FirstName, ' ',g.LastName) = 'Shannon Sagehorn';
 
 
 -- 4. Write a query that returns a list of rooms, reservation ID, and per-room cost for each reservation. The results should include all rooms, whether or not there is a reservation associated with the room.
 -- 306 and 402
+-- Children (under age 18) do not incur additional charges if there is at least one adult per room on the reservation
+-- Jacuzzi rooms cost 25 more $s
 -- 27 rows
-
-SELECT m.RoomNumber, r.ReservationId, DATEDIFF(r.EndDate, r.StartDate),
-    CASE
-        WHEN (r.Adults + r.Children - m.StandardOccupancy) > 0
-            THEN DATEDIFF(r.EndDate, r.StartDate) * (m.BasePrice + 10.95 * (r.Adults + r.Children - m.StandardOccupancy))
-        WHEN (r.Adults + r.Children - m.StandardOccupancy) <= 0
-            THEN  DATEDIFF(EndDate, StartDate) * BasePrice
-        ELSE NULL
-    END AS TotalCost
-	FROM Rooms m
-LEFT JOIN Reservations r
-    ON m.RoomNumber = r.RoomNumber
-LEFT JOIN Guests g
-    ON r.GuestId = g.GuestId;
     
-SELECT m.RoomNumber, r.ReservationId, DATEDIFF(r.EndDate, r.StartDate),
+SELECT m.RoomNumber, r.ReservationId, DATEDIFF(r.EndDate, r.StartDate), DATEDIFF(r.EndDate, r.StartDate) * (
     CASE
-        WHEN (r.Adults + r.Children - m.StandardOccupancy) > 0 AND a.HasJacuzzi = TRUE
-            THEN DATEDIFF(r.EndDate, r.StartDate) * (m.BasePrice + 25 + 10.95 * (r.Adults + r.Children - m.StandardOccupancy))
-		WHEN (r.Adults + r.Children - m.StandardOccupancy) > 0
-            THEN DATEDIFF(r.EndDate, r.StartDate) * (m.BasePrice + 10.95 * (r.Adults + r.Children - m.StandardOccupancy))
-		WHEN (r.Adults + r.Children - m.StandardOccupancy) <= 0 AND a.HasJacuzzi = TRUE
-            THEN  DATEDIFF(EndDate, StartDate) * (BasePrice + 25)
-        WHEN (r.Adults + r.Children - m.StandardOccupancy) <= 0
-            THEN  DATEDIFF(EndDate, StartDate) * BasePrice
+    -- when there are more than standard number of adults, and a jacuzzi charge them the extra person fee and jacuzzi fee
+        WHEN (r.Adults - m.StandardOccupancy) > 0 AND a.HasJacuzzi = TRUE AND r.Adults >= 1
+            THEN (m.BasePrice + 25 + m.ExtraPersonCost * (r.Adults - m.StandardOccupancy))
+	-- When there are only children and a jacuzzi and above occupancy charge them the extra person and the jacuzzi fee
+		WHEN (r.Children - m.StandardOccupancy) > 0 AND a.HasJacuzzi = TRUE AND r.Adults = 0
+            THEN (m.BasePrice + 25 + m.ExtraPersonCost * (r.Children - m.StandardOccupancy))
+	-- when there are more than standard number of adults charge them the extra person fee
+        WHEN (r.Adults - m.StandardOccupancy) > 0 AND r.Adults >= 1
+            THEN (m.BasePrice + m.ExtraPersonCost * (r.Adults - m.StandardOccupancy))
+	-- When there are only children  above occupancy charge them the extra person
+		WHEN (r.Children - m.StandardOccupancy) > 0 AND r.Adults = 0
+            THEN (m.BasePrice + m.ExtraPersonCost * (r.Children - m.StandardOccupancy))
+	-- When there are adults under standard occupany (can include children only rooms under standard occupancy) with a jacuzzi charge them the jacuzzi fee
+		WHEN (r.Adults - m.StandardOccupancy) <= 0 AND a.HasJacuzzi = TRUE
+            THEN (BasePrice + 25)
+	-- When there are adults under standard occupancy and no jacuzzi
+        WHEN (r.Adults - m.StandardOccupancy) <= 0
+            THEN  BasePrice
         ELSE NULL
-    END AS TotalCost
+    END) AS TotalCost
 	FROM Rooms m
 LEFT JOIN Reservations r
     ON m.RoomNumber = r.RoomNumber
@@ -66,6 +64,7 @@ LEFT JOIN Guests g
     ON r.GuestId = g.GuestId
 LEFT JOIN Amenities a
     ON a.AmenitiesId = m.AmenitiesId;
+    
 
 -- 5. Write a query that returns all the rooms accommodating at least three guests and that are reserved on any date in April 2023.
 -- 2 Rows
@@ -77,7 +76,7 @@ INNER JOIN Guests g
 	ON r.GuestId = g.GuestId
 INNER JOIN Rooms m
 	ON m.RoomNumber = r.RoomNumber
-WHERE m.MaxOccupancy >= 3
+WHERE m.MaxOccupancy >= 2
     AND (r.StartDate BETWEEN '2023-04-01' AND '2023-04-30'
 	OR r.EndDate BETWEEN '2023-04-01' AND '2023-04-30')
     OR (r.StartDate < '2023-04-01' AND r.EndDate > '2023-04-30');
@@ -104,7 +103,7 @@ ORDER BY TotalReservations DESC, g.LastName DESC;
 -- '(314) 974-8036'
 -- '(377) 507-0974'
 
-SELECT CONCAT(FirstName, ' ', LastName) AS Name, Address, City, ZipCode, PhoneNumber FROM Guests WHERE PhoneNumber = '(314) 974-8036';
+SELECT CONCAT(FirstName, ' ', LastName) AS Name, Address, City, ZipCode, PhoneNumber FROM Guests WHERE PhoneNumber = '(377) 507-0974';
 
 -- Results :
 -- Shannon Sagehorn    2000 S Michigan Ave     Chicago     60616   (314) -974-8036
