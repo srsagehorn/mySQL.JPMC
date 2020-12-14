@@ -34,8 +34,8 @@ CREATE TABLE Rooms(
     ADAAccessible BOOLEAN NOT NULL,
     StandardOccupancy INT NOT NULL,
     MaxOccupancy INT NOT NULL,
-    BasePrice INT NOT NULL,
-    ExtraPersonCost INT NOT NULL
+    BasePrice DECIMAL(10, 2) NOT NULL,
+    ExtraPersonCost DECIMAL(10, 2) NOT NULL
 );
 
 CREATE TABLE Reservations(
