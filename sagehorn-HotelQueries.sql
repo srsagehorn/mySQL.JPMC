@@ -1,18 +1,51 @@
 -- 1. Write a query that returns a list of reservations that end in July 2023, including the name of the guest, the room number(s), and the reservation dates.
 
-SELECT Name, RoomNumber, StartDate, EndDate
-FROM reservation
-WHERE EndDate BETWEEN  '2023-07-01' AND '2023-07-31';
+SELECT r.RoomNumber, r.StartDate, r.EndDate, g.Name
+    FROM Reservations r
+INNER JOIN Guests g
+	ON r.GuestId = g.GuestId
+WHERE r.EndDate BETWEEN  '2023-07-01' AND '2023-07-31';
 
 -- 2. Write a query that returns a list of all reservations for rooms with a jacuzzi, displaying the guest's name, the room number, and the dates of the reservation.
 
-SELECT 
+SELECT r.RoomNumber, g.Name, r.StartDate, r.EndDate
+    FROM Reservations r
+INNER JOIN Guests g
+    ON r.GuestId = g.GuestId
+INNER JOIN Rooms m
+    ON m.RoomNumber = r.RoomNumber
+INNER JOIN Amenities a
+    ON a.AmenitiesId = m.AmenitiesId
+WHERE a.HasJacuzzi = TRUE;
 
 -- 3. Write a query that returns all the rooms reserved for a specific guest, including the guest's name, the room(s) reserved, the starting date of the reservation, and how many people were included in the reservation. (Choose a guest's name from the existing data.)
 
+SELECT r.RoomNumber, g.Name, r.StartDate, (r.Adults + r.Children) AS TotalPeople
+    FROM Reservations r
+INNER JOIN Guests g
+    ON r.GuestId = g.GuestId
+WHERE g.Name = 'Mack Simmer';
+
 
 -- 4. Write a query that returns a list of rooms, reservation ID, and per-room cost for each reservation. The results should include all rooms, whether or not there is a reservation associated with the room.
+-- 306 and 402
 
+-- decimal rounding issue
+
+SELECT m.RoomNumber, r.ReservationId, 
+CASE
+	WHEN (r.Adults + r.Children - m.StandardOccupancy) > 0
+	THEN (m.BasePrice + 10.95 * (r.Adults + r.Children - m.StandardOccupancy))
+    WHEN (r.Adults + r.Children - m.StandardOccupancy) <= 0
+    THEN BasePrice
+	ELSE NULL
+    END AS TotalCost
+	FROM Rooms m
+LEFT JOIN Reservations r
+    ON m.RoomNumber = r.RoomNumber
+LEFT JOIN Guests g
+    ON r.GuestId = g.GuestId
+    ORDER BY m.RoomNumber;
 
 -- 5. Write a query that returns all the rooms accommodating at least three guests and that are reserved on any date in April 2023.
 
