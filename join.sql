@@ -11199,11 +11199,22 @@ ON ec.ExerciseCategoryId = xc.ParentCategoryId;
 -- Rewrite the query above so that every ExerciseCategory.Name is
 -- included, even if it doesn't have a parent.
 -- 16 rows
+SELECT ec.Name ParentCategory, xc.Name Exercise
+FROM ExerciseCategory ec
+RIGHT JOIN ExerciseCategory xc
+ON ec.ExerciseCategoryId = xc.ParentCategoryId;
 --------------------
 
 -- 12
 -- Are there Clients who are not signed up for a Workout?
 -- 50 rows
+SELECT c.FirstName, c.LastName, w.WorkoutId
+FROM Client c
+LEFT JOIN ClientWorkout cw
+ON c.ClientId = cw.ClientId
+LEFT JOIN Workout w
+ON w.WorkoutId = cw.WorkoutId
+WHERE w.WorkoutId IS NULL;
 --------------------
 
 -- 13
@@ -11211,6 +11222,20 @@ ON ec.ExerciseCategoryId = xc.ParentCategoryId;
 -- Goals are associated to Clients through ClientGoal.
 -- Goals are associated to Workouts through WorkoutGoal.
 -- 6 rows, 4 unique rows
+SELECT c.FirstName, c.LastName, g.Name Goal, w.Name, l.Name
+FROM Client c
+INNER JOIN ClientGoal cg
+ON cg.ClientId = c.ClientId
+INNER JOIN Goal g
+ON g.GoalId = cg.GoalId
+INNER JOIN WorkoutGoal wg
+ON wg.GoalId = g.GoalId
+INNER JOIN Workout w
+ON w.WorkoutId = wg.WorkoutId
+INNER JOIN Level l
+ON l.LevelId = w.LevelId
+WHERE c.LastName = 'Creane' AND l.Name = 'Beginner';
+
 --------------------
 
 -- 14
