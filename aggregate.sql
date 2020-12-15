@@ -1,3 +1,6 @@
+-- ___________________DATABASE ___________________
+See below db for activities
+
 drop database if exists PersonalTrainer;
 
 create database PersonalTrainer;
@@ -11070,227 +11073,103 @@ insert into InvoiceLineItem(InvoiceId, Description, Price, Quantity, ServiceDate
     (1884, 'Individual Instruction', 75.00, 0.25, '2017-10-12'),
     (1884, 'Group Instruction', 22.50, 2.00, '2017-10-18');
 
-USE PersonalTrainer;
--- 1
--- Select all columns from ExerciseCategory and Exercise.
--- The tables should be joined on ExerciseCategoryId.
--- This query returns all Exercises and their associated ExerciseCategory.
--- 64 rows
+    
+-- ___________________ACTIVITIES ___________________
 
-SELECT * FROM ExerciseCategory
-	INNER JOIN Exercise
-	ON Exercise.ExerciseCategoryID = ExerciseCategory.ExerciseCategoryId;
---------------------
-
--- 2    
--- Select ExerciseCategory.Name and Exercise.Name
--- where the ExerciseCategory does not have a ParentCategoryId (it is null).
--- Again, join the tables on their shared key (ExerciseCategoryId).
--- 9 rows
-
-SELECT c.Name, e.Name
-FROM ExerciseCategory c 
-INNER JOIN Exercise e
-	ON e.ExerciseCategoryID = c.ExerciseCategoryId
- WHERE c.ParentCategoryId IS NULL;
---------------------
-
--- 3
--- The query above is a little confusing. At first glance, it's hard to tell
--- which Name belongs to ExerciseCategory and which belongs to Exercise.
--- Rewrite the query using an aliases. 
--- Alias ExerciseCategory.Name as 'CategoryName'.
--- Alias Exercise.Name as 'ExerciseName'.
--- 9 rows
-
-SELECT c.Name CategoryName, e.Name ExerciseName
-FROM ExerciseCategory c 
-INNER JOIN Exercise e
-	ON e.ExerciseCategoryId = c.ExerciseCategoryId
- WHERE c.ParentCategoryId IS NULL;
---------------------
-
--- 4
--- Select FirstName, LastName, and BirthDate from Client
--- and EmailAddress from Login 
--- where Client.BirthDate is in the 1990s.
--- Join the tables by their key relationship. 
--- What is the primary-foreign key relationship?
--- 35 rows
-
-SELECT c.FirstName, c.LastName, c.BirthDate, l.EmailAddress
-FROM Client c 
-INNER JOIN Login l
-	ON c.ClientId = l.ClientId
-WHERE c.BirthDate BETWEEN  '1990-01-01' AND '1999-12-31';
---------------------
-
--- 5
--- Select Workout.Name, Client.FirstName, and Client.LastName
--- for Clients with LastNames starting with 'C'?
--- How are Clients and Workouts related?
--- 25 rows
-SELECT w.Name, c.FirstName, c.LastName
-FROM Client c
-INNER JOIN ClientWorkout l
-On l.ClientId = c.ClientId
-INNER JOIN Workout w
-ON l.WorkoutId = w.WorkoutId
-WHERE c.LastName LIKE 'L%';
-SHOW ERRORS;
---------------------
-
--- 6
--- Select Names from Workouts and their Goals.
--- This is a many-to-many relationship with a bridge table.
--- Use aliases appropriately to avoid ambiguous columns in the result.
-SELECT w.Name, g.Name Goal
-FROM Workout w
-INNER JOIN WorkoutGoal wg
-ON w.WorkoutId = wg.WorkoutId
-INNER JOIN Goal g
-ON wg.GoalId = g.GoalId;
---------------------
-
--- 7
--- Select FirstName and LastName from Client.
--- Select ClientId and EmailAddress from Login.
--- Join the tables, but make Login optional.
+-- Use an aggregate to count the number of Clients.
 -- 500 rows
-SELECT c.FirstName, c.LastName, l.ClientId, l.EmaiLAddress
-FROM Client c
-LEFT JOIN Login l
-ON l.ClientId = c.ClientId;
 --------------------
 
--- 8
--- Using the query above as a foundation, select Clients
--- who do _not_ have a Login.
--- 200 rows
-SELECT c.FirstName, c.LastName, l.ClientId, l.EmaiLAddress
-FROM Client c
-LEFT JOIN Login l
-ON l.ClientId = c.ClientId
-WHERE l.ClientId IS NULL;
+-- Use an aggregate to count Client.BirthDate.
+-- The number is different than total Clients. Why?
+-- 463 rows
 --------------------
 
--- 9
--- Does the Client, Romeo Seaward, have a Login?
--- Decide using a single query.
--- nope :(
-SELECT c.FirstName, c.LastName, l.ClientId, l.EmaiLAddress
-FROM Client c
-LEFT JOIN Login l
-ON l.ClientId = c.ClientId
-WHERE c.FirstName = 'Romeo';
+-- Group Clients by City and count them.
+-- Order by the number of Clients desc.
+-- 20 rows
 --------------------
 
--- 10
--- Select ExerciseCategory.Name and its parent ExerciseCategory's Name.
--- This requires a self-join.
--- 12 rows
-SELECT ec.Name ExerciseCategory, xc.Name
-FROM ExerciseCategory ec
-INNER JOIN ExerciseCategory xc
-ON ec.ExerciseCategoryId = xc.ParentCategoryId;
+-- Calculate a total per invoice using only the InvoiceLineItem table.
+-- Group by InvoiceId.
+-- You'll need an expression for the line item total: Price * Quantity.
+-- Aggregate per group using SUM().
+-- 1000 rows
 --------------------
 
--- 11
--- Rewrite the query above so that every ExerciseCategory.Name is
--- included, even if it doesn't have a parent.
--- 16 rows
-SELECT ec.Name ParentCategory, xc.Name Exercise
-FROM ExerciseCategory ec
-RIGHT JOIN ExerciseCategory xc
-ON ec.ExerciseCategoryId = xc.ParentCategoryId;
+-- Calculate a total per invoice using only the InvoiceLineItem table.
+-- (See above.)
+-- Only include totals greater than $500.00.
+-- Order from lowest total to highest.
+-- 234 rows
 --------------------
 
--- 12
--- Are there Clients who are not signed up for a Workout?
--- 50 rows
-SELECT c.FirstName, c.LastName, w.WorkoutId
-FROM Client c
-LEFT JOIN ClientWorkout cw
-ON c.ClientId = cw.ClientId
-LEFT JOIN Workout w
-ON w.WorkoutId = cw.WorkoutId
-WHERE w.WorkoutId IS NULL;
+-- Calculate the average line item total
+-- grouped by InvoiceLineItem.Description.
+-- 3 rows
 --------------------
 
--- 13
--- Which Beginner-Level Workouts satisfy at least one of Shell Creane's Goals?
--- Goals are associated to Clients through ClientGoal.
--- Goals are associated to Workouts through WorkoutGoal.
--- 6 rows, 4 unique rows
-SELECT c.FirstName, c.LastName, g.Name Goal, w.Name, l.Name
-FROM Client c
-INNER JOIN ClientGoal cg
-ON cg.ClientId = c.ClientId
-INNER JOIN Goal g
-ON g.GoalId = cg.GoalId
-INNER JOIN WorkoutGoal wg
-ON wg.GoalId = g.GoalId
-INNER JOIN Workout w
-ON w.WorkoutId = wg.WorkoutId
-INNER JOIN Level l
-ON l.LevelId = w.LevelId
-WHERE c.LastName = 'Creane' AND l.Name = 'Beginner';
-
+-- Select ClientId, FirstName, and LastName from Client
+-- for clients who have *paid* over $1000 total.
+-- Paid is Invoice.InvoiceStatus = 2.
+-- Order by LastName, then FirstName.
+-- 146 rows
 --------------------
 
--- 14
--- Select all Workouts. 
--- Join to the Goal, 'Core Strength', but make it optional.
--- You may have to look up the GoalId before writing the main query.
--- If you filter on Goal.Name in a WHERE clause, Workouts will be excluded.
--- Why?
--- 26 Workouts, 3 Goals
-SELECT * 
-FROM Workout w
-LEFT OUTER JOIN WorkoutGoal wg
-ON wg.WorkoutId = w.WorkoutId AND wg.GoalId = 10
-LEFT OUTER JOIN Goal g
-ON g.GoalId = wg.GoalId;
+-- Count exercises by category.
+-- Group by ExerciseCategory.Name.
+-- Order by exercise count descending.
+-- 13 rows
 --------------------
 
--- 15
--- The relationship between Workouts and Exercises is... complicated.
--- Workout links to WorkoutDay (one day in a Workout routine)
--- which links to WorkoutDayExerciseInstance 
--- (Exercises can be repeated in a day so a bridge table is required) 
--- which links to ExerciseInstance 
--- (Exercises can be done with different weights, repetions,
--- laps, etc...) 
--- which finally links to Exercise.
--- Select Workout.Name and Exercise.Name for related Workouts and Exercises.
-SELECT w.Name Workout, e.Name Exercise
-	FROM Workout w
-INNER JOIN WorkoutDay wd 
-	ON w.WorkoutId = wd.WorkoutId
-INNER JOIN WorkoutDayExerciseInstance wdei 
-	ON wdei.WorkoutDayId = wd.WorkoutDayId
-INNER JOIN ExerciseInstance ei 
-	ON ei.ExerciseInstanceId = wdei.ExerciseInstanceId
-INNER JOIN Exercise e
-	ON e.ExerciseId = ei.ExerciseId;
+-- Select Exercise.Name along with the minimum, maximum,
+-- and average ExerciseInstance.Sets.
+-- Order by Exercise.Name.
+-- 64 rows
 --------------------
 
--- 16
--- An ExerciseInstance is configured with ExerciseInstanceUnitValue.
--- It contains a Value and UnitId that links to Unit.
--- Example Unit/Value combos include 10 laps, 15 minutes, 200 pounds.
--- Select Exercise.Name, ExerciseInstanceUnitValue.Value, and Unit.Name
--- for the 'Plank' exercise. 
--- How many Planks are configured, which Units apply, and what 
--- are the configured Values?
--- 4 rows, 1 Unit, and 4 distinct Values
-SELECT e.Name, eiuv.Value, u.Name Units
-FROM Exercise e
-INNER JOIN ExerciseInstance ei
-	ON e.ExerciseId = ei.ExerciseId
-INNER JOIN ExerciseInstanceUnitValue eiuv
-	ON ei.ExerciseInstanceId = eiuv.ExerciseInstanceId
-INNER JOIN Unit u
-	ON u.UnitId = eiuv.UnitId
-Where e.Name = 'Plank';
+-- Find the minimum and maximum Client.BirthDate
+-- per Workout.
+-- 26 rows
+-- Sample: 
+-- WorkoutName, EarliestBirthDate, LatestBirthDate
+-- '3, 2, 1... Yoga!', '1928-04-28', '1993-02-07'
+--------------------
+
+-- Count client goals.
+-- Be careful not to exclude rows for clients without goals.
+-- 500 rows total
+-- 50 rows with no goals
+--------------------
+
+-- Select Exercise.Name, Unit.Name, 
+-- and minimum and maximum ExerciseInstanceUnitValue.Value
+-- for all exercises with a configured ExerciseInstanceUnitValue.
+-- Order by Exercise.Name, then Unit.Name.
+-- 82 rows
+--------------------
+
+-- Modify the query above to include ExerciseCategory.Name.
+-- Order by ExerciseCategory.Name, then Exercise.Name, then Unit.Name.
+-- 82 rows
+--------------------
+
+-- Select the minimum and maximum age in years for
+-- each Level.
+-- To calculate age in years, use the MySQL function DATEDIFF.
+-- 4 rows
+--------------------
+
+-- Stretch Goal!
+-- Count logins by email extension (.com, .net, .org, etc...).
+-- Research SQL functions to isolate a very specific part of a string value.
+-- 27 rows (27 unique email extensions)
+--------------------
+
+-- Stretch Goal!
+-- Match client goals to workout goals.
+-- Select Client FirstName and LastName and Workout.Name for
+-- all workouts that match at least 2 of a client's goals.
+-- Order by the client's last name, then first name.
+-- 139 rows
 --------------------
