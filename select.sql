@@ -11142,13 +11142,15 @@ SELECT Name, Notes FROM Workout WHERE LevelId = 3 AND Notes LIKE ('%you%');
 
 -- 16. Select FirstName, LastName, City from Client whose LastName starts with L,M, or N and who live in LaPlace. (5 rows)
 
--- doesnt work, doesnt filter out just laplace cities
-SELECT FirstName, LastName, City FROM Client WHERE City = 'LaPlace' AND LastName LIKE ('L%') OR LastName LIKE ('M%') OR LastName LIKE ('N%');
+SELECT FirstName, LastName, City 
+FROM Client 
+WHERE City = 'LaPlace' AND (LastName LIKE ('L%') OR LastName LIKE ('M%') OR 
+LastName LIKE ('N%'));
 
 -- 17. Select InvoiceId, Description, Price, Quantity, ServiceDate and the line item total, a calculated value, from InvoiceLineItem, where the line item total is between 15 and 25 dollars. (667 rows)
 
 -- Doesnt work
-SELECT InvoiceId, Description, Price, Quantity, ServiceDate, (Price*Quantity) AS LineItemTotal FROM InvoiceLineItem WHERE LineItemTotal BETWEEN 15 AND 25;
+SELECT InvoiceId, Description, Price, Quantity, ServiceDate, (Price*Quantity) AS LineItemTotal FROM InvoiceLineItem WHERE (Price*Quantity) BETWEEN 15 AND 25;
 
 -- 18. Does the database include an email address for the Client, Estrella Bazely?
 
