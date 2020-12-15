@@ -11130,12 +11130,26 @@ WHERE c.BirthDate BETWEEN  '1990-01-01' AND '1999-12-31';
 -- for Clients with LastNames starting with 'C'?
 -- How are Clients and Workouts related?
 -- 25 rows
+SELECT w.Name, c.FirstName, c.LastName
+FROM Client c
+INNER JOIN ClientWorkout l
+On l.ClientId = c.ClientId
+INNER JOIN Workout w
+ON l.WorkoutId = w.WorkoutId
+WHERE c.LastName LIKE 'L%';
+SHOW ERRORS;
 --------------------
 
 -- 6
 -- Select Names from Workouts and their Goals.
 -- This is a many-to-many relationship with a bridge table.
 -- Use aliases appropriately to avoid ambiguous columns in the result.
+SELECT w.Name, g.Name Goal
+FROM Workout w
+INNER JOIN WorkoutGoal wg
+ON w.WorkoutId = wg.WorkoutId
+INNER JOIN Goal g
+ON wg.GoalId = g.GoalId;
 --------------------
 
 -- 7
@@ -11143,24 +11157,42 @@ WHERE c.BirthDate BETWEEN  '1990-01-01' AND '1999-12-31';
 -- Select ClientId and EmailAddress from Login.
 -- Join the tables, but make Login optional.
 -- 500 rows
+SELECT c.FirstName, c.LastName, l.ClientId, l.EmaiLAddress
+FROM Client c
+LEFT JOIN Login l
+ON l.ClientId = c.ClientId;
 --------------------
 
 -- 8
 -- Using the query above as a foundation, select Clients
 -- who do _not_ have a Login.
 -- 200 rows
+SELECT c.FirstName, c.LastName, l.ClientId, l.EmaiLAddress
+FROM Client c
+LEFT JOIN Login l
+ON l.ClientId = c.ClientId
+WHERE l.ClientId IS NULL;
 --------------------
 
 -- 9
 -- Does the Client, Romeo Seaward, have a Login?
 -- Decide using a single query.
 -- nope :(
+SELECT c.FirstName, c.LastName, l.ClientId, l.EmaiLAddress
+FROM Client c
+LEFT JOIN Login l
+ON l.ClientId = c.ClientId
+WHERE c.FirstName = 'Romeo';
 --------------------
 
 -- 10
 -- Select ExerciseCategory.Name and its parent ExerciseCategory's Name.
 -- This requires a self-join.
 -- 12 rows
+SELECT ec.Name ExerciseCategory, xc.Name
+FROM ExerciseCategory ec
+INNER JOIN ExerciseCategory xc
+ON ec.ExerciseCategoryId = xc.ParentCategoryId;
 --------------------
 
 -- 11
